@@ -88,7 +88,9 @@ fn index_push(env: &Env, owner: &Address, kind: u32, id: DeliveryId) {
         .unwrap_or_else(|| soroban_sdk::Vec::new(env));
     page.push_back(id);
     env.storage().persistent().set(&key, &page);
+    env.storage().persistent().extend_ttl(&key, ttl::LEDGER_TTL_THRESHOLD, ttl::LEDGER_TTL_EXTEND_TO);
     env.storage().persistent().set(&len_key, &(len + 1));
+    env.storage().persistent().extend_ttl(&len_key, ttl::LEDGER_TTL_THRESHOLD, ttl::LEDGER_TTL_EXTEND_TO);
 }
 
 #[rustfmt::skip]

@@ -434,6 +434,11 @@ fn settle_holdback_escrow(env: &Env, delivery_id: u64, mut record: EscrowRecord)
         &total_locked_key,
         &current_total.saturating_sub(record.amount),
     );
+    env.storage().persistent().extend_ttl(
+        &total_locked_key,
+        ttl::LEDGER_TTL_THRESHOLD,
+        ttl::LEDGER_TTL_EXTEND_TO,
+    );
 
     let fleet_management = get_fleet_management_contract(env);
     settle_escrow_funds(env, delivery_id, &record, fleet_management, driver_amount, platform_fee);
@@ -508,7 +513,9 @@ fn index_push(env: &Env, owner: &Address, kind: u32, id: u64) {
         .unwrap_or_else(|| soroban_sdk::Vec::new(env));
     page.push_back(id);
     env.storage().persistent().set(&key, &page);
+    env.storage().persistent().extend_ttl(&key, ttl::LEDGER_TTL_THRESHOLD, ttl::LEDGER_TTL_EXTEND_TO);
     env.storage().persistent().set(&len_key, &(len + 1));
+    env.storage().persistent().extend_ttl(&len_key, ttl::LEDGER_TTL_THRESHOLD, ttl::LEDGER_TTL_EXTEND_TO);
 }
 
 #[rustfmt::skip]
@@ -1117,6 +1124,11 @@ impl EscrowContract {
         env.storage()
             .persistent()
             .set(&total_locked_key, &current_total.saturating_add(amount));
+        env.storage().persistent().extend_ttl(
+            &total_locked_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
+        );
 
         env.events().publish(
             (events::escrow_funded(&env),),
@@ -1339,6 +1351,11 @@ impl EscrowContract {
             &total_locked_key,
             &current_total.saturating_add(batch_total),
         );
+        env.storage().persistent().extend_ttl(
+            &total_locked_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
+        );
 
         count
     }
@@ -1421,6 +1438,11 @@ impl EscrowContract {
         env.storage().persistent().set(
             &total_locked_key,
             &current_total.saturating_sub(record.amount),
+        );
+        env.storage().persistent().extend_ttl(
+            &total_locked_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
         );
 
         let fleet_management = get_fleet_management_contract(&env);
@@ -1578,6 +1600,11 @@ impl EscrowContract {
             &total_locked_key,
             &current_total.saturating_sub(record.amount),
         );
+        env.storage().persistent().extend_ttl(
+            &total_locked_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
+        );
 
         token::Client::new(&env, &record.token).transfer(
             &env.current_contract_address(),
@@ -1716,6 +1743,11 @@ impl EscrowContract {
             &total_locked_key,
             &current_total.saturating_sub(record.amount),
         );
+        env.storage().persistent().extend_ttl(
+            &total_locked_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
+        );
 
         if let Some((fleet_management, driver_amount, platform_fee)) = settle_params {
             settle_escrow_funds(
@@ -1814,6 +1846,11 @@ impl EscrowContract {
         env.storage().persistent().set(
             &total_locked_key,
             &current_total.saturating_sub(record.amount),
+        );
+        env.storage().persistent().extend_ttl(
+            &total_locked_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
         );
 
         if sender_amount > 0 {
@@ -2050,6 +2087,11 @@ impl EscrowContract {
         env.storage().persistent().set(
             &total_locked_key,
             &current_total.saturating_sub(record.amount),
+        );
+        env.storage().persistent().extend_ttl(
+            &total_locked_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
         );
 
         token::Client::new(&env, &record.token).transfer(

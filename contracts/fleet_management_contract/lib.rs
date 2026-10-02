@@ -304,6 +304,11 @@ impl FleetManagementContract {
 
         let fleet_id: u64 = current + 1;
         env.storage().persistent().set(&counter_key, &fleet_id);
+        env.storage().persistent().extend_ttl(
+            &counter_key,
+            ttl::LEDGER_TTL_THRESHOLD,
+            ttl::LEDGER_TTL_EXTEND_TO,
+        );
 
         // Build and store the fleet profile with single-owner multi-sig (backward compatible).
         let mut signers = soroban_sdk::Vec::new(&env);
